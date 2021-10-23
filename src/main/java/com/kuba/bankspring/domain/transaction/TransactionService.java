@@ -1,6 +1,6 @@
 package com.kuba.bankspring.domain.transaction;
 
-import com.kuba.bankspring.api.response.OperationView;
+import com.kuba.bankspring.api.dto.response.OperationView;
 import com.kuba.bankspring.domain.account.AccountService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.repository.TransferBetweenAccountsRepository;

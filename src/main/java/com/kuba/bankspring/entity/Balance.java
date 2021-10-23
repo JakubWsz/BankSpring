@@ -7,11 +7,13 @@ import java.math.BigDecimal;
 public class Balance extends BaseEntity{
     private BigDecimal amount;
     private CurrencyType currencyType;
+    private Long clientId;
 
 
-    public Balance(BigDecimal amount, CurrencyType currencyType) {
+    public Balance(BigDecimal amount, CurrencyType currencyType, Long clientId) {
         this.amount = amount;
         this.currencyType = currencyType;
+        this.clientId = clientId;
     }
 
     public Balance() {

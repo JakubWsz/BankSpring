@@ -1,4 +1,4 @@
-package com.kuba.bankspring.api.response;
+package com.kuba.bankspring.api.dto.response;
 
 import java.time.LocalDateTime;
 
