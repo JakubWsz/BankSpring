@@ -1,6 +1,6 @@
 package com.kuba.bankspring.domain.user;
 
-import com.kuba.bankspring.api.response.UserView;
+import com.kuba.bankspring.api.dto.response.UserView;
 import com.kuba.bankspring.entity.User;
 import com.kuba.bankspring.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;

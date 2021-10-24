@@ -1,15 +1,15 @@
 package com.kuba.bankspring.domain.currency.exchange;
 
-
-
 import com.kuba.bankspring.entity.CurrencyType;
 import com.kuba.bankspring.entity.TransferAmount;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Service
 public class CurrencyExchangeService {
-    private static final double PERCENTAGE_PROVISION = 0.042;
+    private static final  double PERCENTAGE_PROVISION = 0.042;
     private final CurrencyExchangeValueEUR currencyExchangeValueEUR;
 
     public CurrencyExchangeService(CurrencyExchangeValueEUR currencyExchangeValueEUR) {

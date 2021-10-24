@@ -21,10 +21,6 @@ public class User extends BaseEntity{
         return login;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getEmail() {
         return email;
     }

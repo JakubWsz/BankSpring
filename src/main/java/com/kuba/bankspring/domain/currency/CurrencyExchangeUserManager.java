@@ -1,15 +1,16 @@
 package com.kuba.bankspring.domain.currency;
 
-
 import com.kuba.bankspring.domain.account.AccountService;
 import com.kuba.bankspring.domain.currency.exchange.CurrencyExchangeService;
 import com.kuba.bankspring.entity.Account;
 import com.kuba.bankspring.entity.Balance;
 import com.kuba.bankspring.entity.CurrencyType;
 import com.kuba.bankspring.entity.TransferAmount;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+@Component
 public class CurrencyExchangeUserManager {
     private final AccountService accountService;
     private final CurrencyExchangeService currencyExchangeService;

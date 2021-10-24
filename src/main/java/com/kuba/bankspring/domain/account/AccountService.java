@@ -3,6 +3,8 @@ package com.kuba.bankspring.domain.account;
 import com.kuba.bankspring.domain.user.UserService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.repository.AccountRepository;
+import com.kuba.bankspring.infrastructure.repository.BalanceRepository;
+import com.kuba.bankspring.infrastructure.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,11 +14,17 @@ import java.util.UUID;
 public class AccountService {
     private final UserService userService;
     private final AccountRepository accountRepository;
+    private final BalanceRepository balanceRepository;
+    private final ClientRepository clientRepository;
 
-    public AccountService(UserService userService, AccountRepository accountRepository) {
+    public AccountService(UserService userService, AccountRepository accountRepository,
+                          BalanceRepository balanceRepository, ClientRepository clientRepository) {
         this.userService = userService;
         this.accountRepository = accountRepository;
+        this.balanceRepository = balanceRepository;
+        this.clientRepository = clientRepository;
     }
+
 
     public Account createAccount(String firstName, String lastName, String idCardNumber, long userId,
                                  AccountType accountType, CurrencyType currencyType, Integer pin) {
@@ -32,8 +40,26 @@ public class AccountService {
 
         String accountNumber = UUID.randomUUID().toString();
 
-        return accountRepository.saveAccount(new Account(accountType, accountNumber, new Client(firstName, lastName,
-                idCardNumber), user, new Balance(BigDecimal.ZERO, currencyType),pin));
+        saveClient(firstName, lastName, idCardNumber);
+
+        long clientId = getClientId(firstName, lastName, idCardNumber);
+
+        Client client = getClient(clientId);
+
+        saveBalance(currencyType, clientId);
+
+        Balance balance = getBalance(idCardNumber,clientId);
+
+        return accountRepository.saveAccount(new Account(accountType, accountNumber, client, user,balance, pin));
+    }
+
+    public void updateBalance(String accountNumber, BigDecimal sum) {
+        accountRepository.updateBalance(accountNumber, sum);
+    }
+
+    public Account getAccountByAccountNumber(String accountNumber) {
+        return accountRepository.getByAccountNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("account not found"));
     }
 
     private void validateFirstnameLastnameIDCardNumber(String firstName, String lastName, String idCardNumber,
@@ -62,12 +88,23 @@ public class AccountService {
             throw new RuntimeException("PIN is to short");
     }
 
-    public Account getAccountByAccountNumber(String accountNumber) {
-        return accountRepository.getByAccountNumber(accountNumber)
-                .orElseThrow(() -> new RuntimeException("account not found"));
+    private void saveBalance(CurrencyType currencyType, long clientId) {
+        balanceRepository.saveBalance(new Balance(BigDecimal.ZERO, currencyType, clientId));
     }
 
-    public void updateBalance(String accountNumber, BigDecimal sum) {
-        accountRepository.updateBalance(accountNumber, sum);
+    private Balance getBalance(String idCardNumber, long clientId){
+       return balanceRepository.getBalanceByIdCardNumberAndClientId(idCardNumber, clientId);
+    }
+
+    private void saveClient(String firstName, String lastName, String idCardNumber) {
+        clientRepository.saveClient(new Client(firstName, lastName, idCardNumber));
+    }
+
+    private long getClientId(String firstName, String lastName, String idCardNumber) {
+        return clientRepository.getClientIdByFirstNameLastNameIdCardNumber(firstName, lastName, idCardNumber);
+    }
+
+    private Client getClient(long clientId){
+        return clientRepository.getClientByClientId(clientId);
     }
 }
