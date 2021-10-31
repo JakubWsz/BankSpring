@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface ClientRepository extends JpaRepository<Client,Long> {
     Client saveClient(Client client);
     long getClientIdByFirstNameLastNameIdCardNumber(String firstName, String lastName,String idCardNumber);
-    Client getClientByClientId(long id);
+    Client getClientByFirstNameAndLastName(String firstName, String lastName);
 }

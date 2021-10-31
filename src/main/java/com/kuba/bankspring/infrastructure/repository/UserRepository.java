@@ -12,5 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean isUserExists(String login);
     User saveUser(User user);
     Optional<User> getById(long id);
+    Optional<User> getByLoginAndPassword(String login, String password);
     List<User> getAll();
 }

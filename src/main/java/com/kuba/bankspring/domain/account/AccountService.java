@@ -1,5 +1,6 @@
 package com.kuba.bankspring.domain.account;
 
+import com.kuba.bankspring.domain.client.ClientService;
 import com.kuba.bankspring.domain.user.UserService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.repository.AccountRepository;
@@ -18,39 +19,24 @@ public class AccountService {
     private final ClientRepository clientRepository;
 
     public AccountService(UserService userService, AccountRepository accountRepository,
-                          BalanceRepository balanceRepository, ClientRepository clientRepository) {
+                          BalanceRepository balanceRepository, ClientService clientService, ClientRepository clientRepository) {
         this.userService = userService;
         this.accountRepository = accountRepository;
         this.balanceRepository = balanceRepository;
         this.clientRepository = clientRepository;
     }
 
-
-    public Account createAccount(String firstName, String lastName, String idCardNumber, long userId,
-                                 AccountType accountType, CurrencyType currencyType, Integer pin) {
-        User user = userService.getUserById(userId);
-        boolean accountTypeExists = accountRepository.getAccountsByUserId(user.getId()).stream()
-                .anyMatch(account -> account.getAccountType().equals(accountType));
-
-        if (accountTypeExists) {
-            throw new RuntimeException("provided account type already exists");
-        }
-
-        validateFirstnameLastnameIDCardNumber(firstName, lastName, idCardNumber, pin.toString());
-
+    public Account createAccount(String firstName, String lastName, AccountType accountType,
+                                 CurrencyType currencyType, Integer pin) {
         String accountNumber = UUID.randomUUID().toString();
-
-        saveClient(firstName, lastName, idCardNumber);
-
-        long clientId = getClientId(firstName, lastName, idCardNumber);
-
-        Client client = getClient(clientId);
+        
+        Client client = getClient(firstName,lastName);
 
         saveBalance(currencyType, clientId);
 
-        Balance balance = getBalance(idCardNumber,clientId);
+        Balance balance = getBalance(idCardNumber, clientId);
 
-        return accountRepository.saveAccount(new Account(accountType, accountNumber, client, user,balance, pin));
+        return accountRepository.saveAccount(new Account(accountType, accountNumber, client, user, balance, pin));
     }
 
     public void updateBalance(String accountNumber, BigDecimal sum) {
@@ -92,19 +78,11 @@ public class AccountService {
         balanceRepository.saveBalance(new Balance(BigDecimal.ZERO, currencyType, clientId));
     }
 
-    private Balance getBalance(String idCardNumber, long clientId){
-       return balanceRepository.getBalanceByIdCardNumberAndClientId(idCardNumber, clientId);
+    private Balance getBalance(String idCardNumber, long clientId) {
+        return balanceRepository.getBalanceByIdCardNumberAndClientId(idCardNumber, clientId);
     }
 
-    private void saveClient(String firstName, String lastName, String idCardNumber) {
-        clientRepository.saveClient(new Client(firstName, lastName, idCardNumber));
-    }
-
-    private long getClientId(String firstName, String lastName, String idCardNumber) {
-        return clientRepository.getClientIdByFirstNameLastNameIdCardNumber(firstName, lastName, idCardNumber);
-    }
-
-    private Client getClient(long clientId){
-        return clientRepository.getClientByClientId(clientId);
+    private Client getClient(String firstName, String lastName) {
+        return clientRepository.getClientByFirstNameAndLastName(firstName, lastName);
     }
 }

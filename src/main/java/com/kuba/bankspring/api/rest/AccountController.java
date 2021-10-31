@@ -22,8 +22,6 @@ public class AccountController {
         return accountService.createAccount(
                 createAccountRequest.getFirstName(),
                 createAccountRequest.getLastName(),
-                createAccountRequest.getIdCardNumber(),
-                createAccountRequest.getUser().getId(),
                 createAccountRequest.getAccountType(),
                 createAccountRequest.getCurrencyType(),
                 createAccountRequest.getPin()
