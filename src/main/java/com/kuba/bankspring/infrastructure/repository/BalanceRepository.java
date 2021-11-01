@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BalanceRepository extends JpaRepository<Balance, Long> {
-    void saveBalance(Balance balance);
-    Balance getBalanceByIdCardNumberAndClientId(String cardNumber,long clientId);
+    Balance saveBalance(Balance balance);
 }

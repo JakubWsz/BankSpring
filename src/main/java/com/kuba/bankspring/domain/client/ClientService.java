@@ -22,7 +22,7 @@ public class ClientService {
 
         validateFirstnameLastname(firstName, lastName);
 
-        Client client = new Client(firstName,lastName,AccountNumberCreator(),getUser(login,password));
+        Client client = new Client(firstName,lastName, IdCardNumberCreator(),getUser(login,password));
 
        return saveClient(client);
     }
@@ -43,7 +43,7 @@ public class ClientService {
         return clientRepository.saveClient(client);
     }
 
-    private String AccountNumberCreator(){
+    private String IdCardNumberCreator(){
         Integer variant = UUID.randomUUID().variant();
         Integer version = UUID.randomUUID().version();
 

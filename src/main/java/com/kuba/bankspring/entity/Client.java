@@ -2,6 +2,7 @@ package com.kuba.bankspring.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Client extends BaseEntity{
@@ -10,6 +11,8 @@ public class Client extends BaseEntity{
     private String idCardNumber;
     @ManyToOne
     private  User user;
+    @OneToOne
+    private Account account;
 
     public Client(String firstName, String lastName, String idCardNumber, User user) {
         this.firstName = firstName;
@@ -31,4 +34,9 @@ public class Client extends BaseEntity{
     public String getIdCardNumber() {
         return idCardNumber;
     }
+
+    public User getUser() {
+        return user;
+    }
+
 }

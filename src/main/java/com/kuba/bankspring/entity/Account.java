@@ -6,20 +6,15 @@ import javax.persistence.Entity;
 public class Account extends BaseEntity {
     private AccountType accountType;
     private String accountNumber;
-    private Client client;
-    private User user;
     private Balance balance;
     private Integer pin;
 
     public Account() {
     }
 
-    public Account( AccountType accountType, String accountNumber, Client client, User user, Balance balance,
-                   Integer pin) {
+    public Account( AccountType accountType, String accountNumber, Balance balance, Integer pin) {
         this.accountType = accountType;
         this.accountNumber = accountNumber;
-        this.client = client;
-        this.user = user;
         this.balance = balance;
         this.pin = pin;
     }
@@ -30,14 +25,6 @@ public class Account extends BaseEntity {
 
     public String getAccountNumber() {
         return accountNumber;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public Integer getPin() {
@@ -56,10 +43,6 @@ public class Account extends BaseEntity {
         this.accountNumber = accountNumber;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public void setBalance(Balance balance) {
         this.balance = balance;
     }
@@ -74,8 +57,6 @@ public class Account extends BaseEntity {
         return "Account{" +
                 ", accountType=" + accountType +
                 ", accountNumber='" + accountNumber + '\'' +
-                ", client=" + client +
-                ", user=" + user +
                 ", balance=" + balance +
                 ", pin=" + pin +
                 '}';

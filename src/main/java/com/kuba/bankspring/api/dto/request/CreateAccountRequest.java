@@ -6,17 +6,17 @@ public class CreateAccountRequest {
 
     private final String firstName;
     private final String lastName;
-    private final String idCardNumber;
+    private final String email;
     private final User user;
     private final AccountType accountType;
     private final CurrencyType currencyType;
     private final Integer pin;
 
-    public CreateAccountRequest(String firstName, String lastName, String idCardNumber, User user,
+    public CreateAccountRequest(String firstName, String lastName, String email, User user,
                                 AccountType accountType, CurrencyType currencyType, Integer pin) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.idCardNumber = idCardNumber;
+        this.email = email;
         this.user = user;
         this.accountType = accountType;
         this.currencyType = currencyType;
@@ -31,9 +31,7 @@ public class CreateAccountRequest {
         return lastName;
     }
 
-    public String getIdCardNumber() {
-        return idCardNumber;
-    }
+    public String getEmail() { return email; }
 
     public User getUser() {
         return user;
