@@ -1,8 +1,10 @@
 package com.kuba.bankspring.domain.account;
 
-import com.kuba.bankspring.domain.user.UserService;
+import com.kuba.bankspring.domain.balance.BalanceService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.repository.AccountRepository;
+import com.kuba.bankspring.infrastructure.repository.ClientRepository;
+import com.kuba.bankspring.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -10,56 +12,40 @@ import java.util.UUID;
 
 @Service
 public class AccountService {
-    private final UserService userService;
+    private final UserRepository userRepository;
+    private final BalanceService balanceService;
     private final AccountRepository accountRepository;
+    private final ClientRepository clientRepository;
 
-    public AccountService(UserService userService, AccountRepository accountRepository) {
-        this.userService = userService;
+    public AccountService(UserRepository userRepository, BalanceService balanceService, AccountRepository accountRepository,
+                          ClientRepository clientRepository) {
+        this.userRepository = userRepository;
+        this.balanceService = balanceService;
         this.accountRepository = accountRepository;
+        this.clientRepository = clientRepository;
     }
 
-    public Account createAccount(String firstName, String lastName, String idCardNumber, long userId,
-                                 AccountType accountType, CurrencyType currencyType, Integer pin) {
-        User user = userService.getUserById(userId);
-        boolean accountTypeExists = accountRepository.getAccountsByUserId(user.getId()).stream()
-                .anyMatch(account -> account.getAccountType().equals(accountType));
-
-        if (accountTypeExists) {
-            throw new RuntimeException("provided account type already exists");
-        }
-
-        validateFirstnameLastnameIDCardNumber(firstName, lastName, idCardNumber, pin.toString());
+    public Account createAccount(String firstName, String lastName, String email, AccountType accountType,
+                                 CurrencyType currencyType, Integer pin) {
+        validatePin(pin.toString());
 
         String accountNumber = UUID.randomUUID().toString();
 
-        return accountRepository.saveAccount(new Account(accountType, accountNumber, new Client(firstName, lastName,
-                idCardNumber), user, new Balance(BigDecimal.ZERO, currencyType),pin));
+        Client client = getClient(firstName, lastName);
+
+        User user = getUser(email);
+
+        Balance balance = createBalance(currencyType);
+
+        Account account = (new Account(accountType, accountNumber, balance, pin));
+
+        if (client.getUser().equals(user))
+            return accountRepository.saveAccount(account);
+        else throw new RuntimeException("Firstname, lastname or email is invalid");
     }
 
-    private void validateFirstnameLastnameIDCardNumber(String firstName, String lastName, String idCardNumber,
-                                                       String pin) {
-        if (firstName == null)
-            throw new RuntimeException("you don't pass firstName");
-        else if (lastName == null)
-            throw new RuntimeException("you don't pass lastName");
-        else if (idCardNumber == null)
-            throw new RuntimeException("you don't pass idCardNumber");
-        else if (pin == null)
-            throw new RuntimeException("you don't pass pin");
-
-        if (firstName.length() < 2)
-            throw new RuntimeException("firstname is to short");
-        else if (lastName.length() < 2)
-            throw new RuntimeException("lastname is to short");
-        else if (idCardNumber.length() > 9)
-            throw new RuntimeException("ID Card Number length is to long");
-        else if (idCardNumber.length() < 9)
-            throw new RuntimeException("ID Card Number length is to short");
-
-        if (pin.length() > 4)
-            throw new RuntimeException("PIN is to long");
-        else if (pin.length() < 4)
-            throw new RuntimeException("PIN is to short");
+    public void updateBalance(String accountNumber, BigDecimal sum) {
+        accountRepository.updateBalance(accountNumber, sum);
     }
 
     public Account getAccountByAccountNumber(String accountNumber) {
@@ -67,7 +53,25 @@ public class AccountService {
                 .orElseThrow(() -> new RuntimeException("account not found"));
     }
 
-    public void updateBalance(String accountNumber, BigDecimal sum) {
-        accountRepository.updateBalance(accountNumber, sum);
+    private void validatePin(String pin) {
+
+        if (pin.length() > 4)
+            throw new RuntimeException("PIN is to long");
+        else if (pin.length() < 4)
+            throw new RuntimeException("PIN is to short");
+    }
+
+    private Client getClient(String firstName, String lastName) {
+        return clientRepository.getClientByFirstNameAndLastName(firstName, lastName)
+                .orElseThrow(() -> new RuntimeException("There is no client with passed firstname and lastname "));
+    }
+
+    private User getUser(String email) {
+        return userRepository.getUserByEmail(email)
+                .orElseThrow(() -> new RuntimeException("There is no user with passed email"));
+    }
+
+    private Balance createBalance(CurrencyType currencyType) {
+        return balanceService.createBalance(currencyType);
     }
 }

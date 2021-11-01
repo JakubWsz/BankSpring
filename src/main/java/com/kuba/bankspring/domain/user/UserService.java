@@ -1,6 +1,7 @@
 package com.kuba.bankspring.domain.user;
 
-import com.kuba.bankspring.api.response.UserView;
+import com.kuba.bankspring.api.dto.response.UserView;
+import com.kuba.bankspring.entity.Client;
 import com.kuba.bankspring.entity.User;
 import com.kuba.bankspring.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,9 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, List<Client> clients) {
         this.userRepository = userRepository;
     }
-
 
     public User createUser(String login, String password, String email) {
         if (userRepository.isUserExists(login)) {

@@ -8,6 +8,7 @@ public class User extends BaseEntity{
     private String password;
     private String email;
 
+
     public User() {
     }
 
@@ -19,10 +20,6 @@ public class User extends BaseEntity{
 
     public String getLogin() {
         return login;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getEmail() {

@@ -1,4 +1,4 @@
-package com.kuba.bankspring.api.response;
+package com.kuba.bankspring.api.dto.response;
 
 public class UserView {
     private final Long id;

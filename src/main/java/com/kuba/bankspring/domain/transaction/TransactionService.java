@@ -1,6 +1,6 @@
 package com.kuba.bankspring.domain.transaction;
 
-import com.kuba.bankspring.api.response.OperationView;
+import com.kuba.bankspring.api.dto.response.OperationView;
 import com.kuba.bankspring.domain.account.AccountService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.repository.TransferBetweenAccountsRepository;
@@ -85,37 +85,6 @@ public class TransactionService {
         return operations;
     }
 
-    private List<Operation> mapToOperationsSelf(List<TransferSelf> historyTransferSelf) {
-        List<Operation> operations = new ArrayList<>();
-        for (TransferSelf transferSelf : historyTransferSelf) {
-            Operation operation = new Operation(
-                    transferSelf.getCreatedAt(),
-                    transferSelf.getBalanceBefore().toPlainString(),
-                    transferSelf.getTransferAmount().getAmount().toPlainString(),
-                    transferSelf.getTransferAmount().getCurrencyType().toString(),
-                    "deposit or withdraw " + transferSelf.getTransferAmount().getAmount().toPlainString()
-                            + " at " + transferSelf.getCreatedAt());
-            operations.add(operation);
-        }
-        return operations;
-    }
-
-    private List<Operation> mapToOperationsBetweenAccounts(List<TransferBetweenAccounts> historyTransferSelf) {
-        List<Operation> operations = new ArrayList<>();
-        for (TransferBetweenAccounts transferBetweenAccounts : historyTransferSelf) {
-            Operation operation = new Operation(
-                    transferBetweenAccounts.getCreatedAt(),
-                    transferBetweenAccounts.getBalanceBefore().toPlainString(),
-                    transferBetweenAccounts.getTransferAmount().getAmount().toPlainString(),
-                    transferBetweenAccounts.getTransferAmount().getCurrencyType().toString(),
-                    "deposit or withdraw " + transferBetweenAccounts
-                            .getTransferAmount().getAmount().toPlainString()
-                            + " at " + transferBetweenAccounts.getCreatedAt());
-            operations.add(operation);
-        }
-        return operations;
-    }
-
     public Account transfer(TransferAmount transferAmount, String myAccountNumber, String targetAccountNumber
             , Integer pin) {
         validateTransferInput(transferAmount, myAccountNumber, targetAccountNumber);
@@ -145,6 +114,37 @@ public class TransactionService {
                         , transferAmount, targetSum.add(transferAmount.getAmount()),
                         LocalDateTime.now()));
         return myAccount;
+    }
+
+    private List<Operation> mapToOperationsSelf(List<TransferSelf> historyTransferSelf) {
+        List<Operation> operations = new ArrayList<>();
+        for (TransferSelf transferSelf : historyTransferSelf) {
+            Operation operation = new Operation(
+                    transferSelf.getCreatedAt(),
+                    transferSelf.getBalanceBefore().toPlainString(),
+                    transferSelf.getTransferAmount().getAmount().toPlainString(),
+                    transferSelf.getTransferAmount().getCurrencyType().toString(),
+                    "deposit or withdraw " + transferSelf.getTransferAmount().getAmount().toPlainString()
+                            + " at " + transferSelf.getCreatedAt());
+            operations.add(operation);
+        }
+        return operations;
+    }
+
+    private List<Operation> mapToOperationsBetweenAccounts(List<TransferBetweenAccounts> historyTransferSelf) {
+        List<Operation> operations = new ArrayList<>();
+        for (TransferBetweenAccounts transferBetweenAccounts : historyTransferSelf) {
+            Operation operation = new Operation(
+                    transferBetweenAccounts.getCreatedAt(),
+                    transferBetweenAccounts.getBalanceBefore().toPlainString(),
+                    transferBetweenAccounts.getTransferAmount().getAmount().toPlainString(),
+                    transferBetweenAccounts.getTransferAmount().getCurrencyType().toString(),
+                    "deposit or withdraw " + transferBetweenAccounts
+                            .getTransferAmount().getAmount().toPlainString()
+                            + " at " + transferBetweenAccounts.getCreatedAt());
+            operations.add(operation);
+        }
+        return operations;
     }
 
     private void validateDepositAndWithdrawInput(TransferAmount transferAmount, String accountNumber) {
