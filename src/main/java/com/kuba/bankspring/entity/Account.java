@@ -12,7 +12,8 @@ public class Account extends BaseEntity {
     public Account() {
     }
 
-    public Account( AccountType accountType, String accountNumber, Balance balance, Integer pin) {
+    public Account(AccountType accountType, String accountNumber,
+                   Balance balance, Integer pin) {
         this.accountType = accountType;
         this.accountNumber = accountNumber;
         this.balance = balance;

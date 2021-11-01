@@ -17,8 +17,8 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
 
-    public AccountService(UserRepository userRepository, BalanceService balanceService, AccountRepository accountRepository,
-                          ClientRepository clientRepository) {
+    public AccountService(UserRepository userRepository, BalanceService balanceService,
+                          AccountRepository accountRepository, ClientRepository clientRepository) {
         this.userRepository = userRepository;
         this.balanceService = balanceService;
         this.accountRepository = accountRepository;
@@ -35,13 +35,11 @@ public class AccountService {
 
         User user = getUser(email);
 
-        Balance balance = createBalance(currencyType);
-
-        Account account = (new Account(accountType, accountNumber, balance, pin));
-
-        if (client.getUser().equals(user))
+        if (client.getUser().equals(user)) {
+            Balance balance = createBalance(currencyType,client);
+            Account account = (new Account(accountType, accountNumber, balance, pin));
             return accountRepository.saveAccount(account);
-        else throw new RuntimeException("Firstname, lastname or email is invalid");
+        } else throw new RuntimeException("Firstname, lastname or email is invalid");
     }
 
     public void updateBalance(String accountNumber, BigDecimal sum) {
@@ -71,7 +69,7 @@ public class AccountService {
                 .orElseThrow(() -> new RuntimeException("There is no user with passed email"));
     }
 
-    private Balance createBalance(CurrencyType currencyType) {
-        return balanceService.createBalance(currencyType);
+    private Balance createBalance(CurrencyType currencyType,Client client) {
+        return balanceService.createBalance(currencyType,client);
     }
 }
