@@ -5,6 +5,7 @@ import com.kuba.bankspring.domain.account.AccountService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.repository.TransferBetweenAccountsRepository;
 import com.kuba.bankspring.infrastructure.repository.TransferSelfRepository;
+import com.kuba.bankspring.infrastructure.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,20 +21,25 @@ public class TransactionService {
     private final AccountService accountService;
     private final TransferSelfRepository transferSelfRepository;
     private final TransferBetweenAccountsRepository transferBetweenAccountsRepository;
+    private final UserRepository userRepository;
 
     public TransactionService(AccountService accountService, TransferSelfRepository transferSelfRepository,
-                              TransferBetweenAccountsRepository transferBetweenAccountsRepository) {
+                              TransferBetweenAccountsRepository transferBetweenAccountsRepository,
+                              UserRepository userRepository) {
         this.accountService = accountService;
         this.transferSelfRepository = transferSelfRepository;
         this.transferBetweenAccountsRepository = transferBetweenAccountsRepository;
+        this.userRepository = userRepository;
     }
 
-
-    public Account deposit(TransferAmount transferAmount, String accountNumber, Integer pin) {
+    // TODO: 09.01.2022 delete login and password and just check that user is logged or not
+    public Account deposit(TransferAmount transferAmount, String accountNumber, Integer pin,
+                           String login, String password) {
         validateDepositAndWithdrawInput(transferAmount, accountNumber);
         Account account = accountService.getAccountByAccountNumber(accountNumber);
+        Optional<User> user = userRepository.getByLoginAndPassword(login,password);
 
-       if (!pin.equals(account.getPin())){
+       if (!pin.equals(user.get().getPin())){
            throw new RuntimeException("Wrong PIN passed");
        }
 
@@ -47,11 +54,14 @@ public class TransactionService {
         return account;
     }
 
-    public Account withdraw(TransferAmount transferAmount, String accountNumber, Integer pin) {
+    // TODO: 09.01.2022 delete login and password and just check that user is logged or not
+    public Account withdraw(TransferAmount transferAmount, String accountNumber, Integer pin,
+                            String login, String password) {
         validateDepositAndWithdrawInput(transferAmount, accountNumber);
         Account account = accountService.getAccountByAccountNumber(accountNumber);
+        Optional<User> user = userRepository.getByLoginAndPassword(login,password);
 
-        if (!pin.equals(account.getPin())){
+        if (!pin.equals(user.get().getPin())){
             throw new RuntimeException("Wrong PIN passed");
         }
 
@@ -85,13 +95,16 @@ public class TransactionService {
         return operations;
     }
 
+    // TODO: 09.01.2022 delete login and password and just check that user is logged or not
     public Account transfer(TransferAmount transferAmount, String myAccountNumber, String targetAccountNumber
-            , Integer pin) {
+            , Integer pin, String login, String password) {
         validateTransferInput(transferAmount, myAccountNumber, targetAccountNumber);
         Account myAccount = accountService.getAccountByAccountNumber(myAccountNumber);
         Account targetAccount = accountService.getAccountByAccountNumber(targetAccountNumber);
+        Optional<User> user = userRepository.getByLoginAndPassword(login,password);
 
-        if (!pin.equals(myAccount.getPin())){
+
+        if (!pin.equals(user.get().getPin())){
             throw new RuntimeException("Wrong PIN passed");
         }
         if (transferAmount.getCurrencyType() != myAccount.getBalance().getCurrencyType()) {

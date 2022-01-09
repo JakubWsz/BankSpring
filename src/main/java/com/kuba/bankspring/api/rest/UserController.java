@@ -22,7 +22,8 @@ public class UserController {
         return userService.createUser(
                 createUserRequest.getLogin(),
                 createUserRequest.getPassword(),
-                createUserRequest.getEmail()
+                createUserRequest.getEmail(),
+                createUserRequest.getPin()
         );
     }
 }

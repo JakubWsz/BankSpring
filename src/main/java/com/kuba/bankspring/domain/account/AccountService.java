@@ -2,6 +2,7 @@ package com.kuba.bankspring.domain.account;
 
 import com.kuba.bankspring.domain.balance.BalanceService;
 import com.kuba.bankspring.entity.*;
+import com.kuba.bankspring.infrastructure.factory.AccountFactory;
 import com.kuba.bankspring.infrastructure.repository.AccountRepository;
 import com.kuba.bankspring.infrastructure.repository.ClientRepository;
 import com.kuba.bankspring.infrastructure.repository.UserRepository;
@@ -26,9 +27,7 @@ public class AccountService {
     }
 
     public Account createAccount(String firstName, String lastName, String email, AccountType accountType,
-                                 CurrencyType currencyType, Integer pin) {
-        validatePin(pin.toString());
-
+                                 CurrencyType currencyType) {
         String accountNumber = UUID.randomUUID().toString();
 
         Client client = getClient(firstName, lastName);
@@ -37,7 +36,7 @@ public class AccountService {
 
         Balance balance = createBalance(currencyType);
 
-        Account account = (new Account(accountType, accountNumber, balance, pin));
+        Account account = AccountFactory.accountCreator(accountType, accountNumber, balance);
 
         if (client.getUser().equals(user))
             return accountRepository.saveAccount(account);

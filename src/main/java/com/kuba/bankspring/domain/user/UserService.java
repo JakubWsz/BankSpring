@@ -19,14 +19,14 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser(String login, String password, String email) {
+    public User createUser(String login, String password, String email, int pin) {
         if (userRepository.isUserExists(login)) {
             throw new RuntimeException("user already exists");
         }
 
-        validateLoginPasswordAndEmail(login, password, email);
+        validateLoginPasswordEmailAndPin(login, password, email, pin);
 
-        return userRepository.saveUser(new User(login, password, email));
+        return userRepository.saveUser(new User(login, password, email, pin));
     }
 
     public User getUserById(long id) {
@@ -40,18 +40,24 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    private void validateLoginPasswordAndEmail(String login, String password, String email) {
+    private void validateLoginPasswordEmailAndPin(String login, String password, String email, Integer pin) {
         if (login == null)
             throw new RuntimeException("you don't pass login");
         else if (password == null)
             throw new RuntimeException("you don't pass password");
         else if (email == null)
             throw new RuntimeException("you don't pass email");
+        else if  (pin == null)
+                    throw new RuntimeException("you don't pass pin");
 
         if (login.length() < 5)
             throw new RuntimeException("login is to short");
         else if (password.length() < 5)
             throw new RuntimeException("password is to short");
+        else if (pin.toString().length() < 4)
+            throw new RuntimeException("pin is to short");
+        else if (pin.toString().length() > 4)
+            throw new RuntimeException("pin is to short");
 
         Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(email);
