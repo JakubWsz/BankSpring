@@ -1,6 +1,7 @@
 package com.kuba.bankspring.domain.account;
 
 import com.kuba.bankspring.entity.*;
+import com.kuba.bankspring.infrastructure.factory.AccountFactory;
 import com.kuba.bankspring.infrastructure.repository.AccountRepository;
 import com.kuba.bankspring.infrastructure.repository.ClientRepository;
 import com.kuba.bankspring.infrastructure.repository.UserRepository;
@@ -15,10 +16,9 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
 
-    public AccountService(UserRepository userRepository, BalanceService balanceService, AccountRepository accountRepository,
+    public AccountService(UserRepository userRepository, AccountRepository accountRepository,
                           ClientRepository clientRepository) {
         this.userRepository = userRepository;
-        this.balanceService = balanceService;
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
     }
