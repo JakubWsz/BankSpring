@@ -1,6 +1,5 @@
 package com.kuba.bankspring.domain.account;
 
-import com.kuba.bankspring.domain.balance.BalanceService;
 import com.kuba.bankspring.entity.*;
 import com.kuba.bankspring.infrastructure.factory.AccountFactory;
 import com.kuba.bankspring.infrastructure.repository.AccountRepository;
@@ -14,14 +13,13 @@ import java.util.UUID;
 @Service
 public class AccountService {
     private final UserRepository userRepository;
-    private final BalanceService balanceService;
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
 
-    public AccountService(UserRepository userRepository, BalanceService balanceService, AccountRepository accountRepository,
+    public AccountService(UserRepository userRepository,
+                          AccountRepository accountRepository,
                           ClientRepository clientRepository) {
         this.userRepository = userRepository;
-        this.balanceService = balanceService;
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
     }
@@ -34,17 +32,18 @@ public class AccountService {
 
         User user = getUser(email);
 
-        Balance balance = createBalance(currencyType);
-
-        Account account = AccountFactory.accountCreator(accountType, accountNumber, balance);
+        Account account = AccountFactory.accountCreator(accountType, accountNumber,BigDecimal.ZERO ,currencyType);
 
         if (client.getUser().equals(user))
-            return accountRepository.saveAccount(account);
+            return accountRepository.save(account);
         else throw new RuntimeException("Firstname, lastname or email is invalid");
     }
 
     public void updateBalance(String accountNumber, BigDecimal sum) {
-        accountRepository.updateBalance(accountNumber, sum);
+        accountRepository.findAccountByAccountNumber(accountNumber)
+                .ifPresent(account -> {
+                    account.setAmount(sum);
+                    accountRepository.save(account);});
     }
 
     public Account getAccountByAccountNumber(String accountNumber) {
@@ -68,9 +67,5 @@ public class AccountService {
     private User getUser(String email) {
         return userRepository.getUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("There is no user with passed email"));
-    }
-
-    private Balance createBalance(CurrencyType currencyType) {
-        return balanceService.createBalance(currencyType);
     }
 }

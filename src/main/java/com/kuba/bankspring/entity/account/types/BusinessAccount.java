@@ -2,11 +2,12 @@ package com.kuba.bankspring.entity.account.types;
 
 import com.kuba.bankspring.entity.Account;
 import com.kuba.bankspring.entity.AccountType;
-import com.kuba.bankspring.entity.Balance;
-import com.kuba.bankspring.infrastructure.factory.AccountFactory;
+import com.kuba.bankspring.entity.CurrencyType;
+
+import java.math.BigDecimal;
 
 public class BusinessAccount extends Account {
-    public BusinessAccount(AccountType accountType, String accountNumber, Balance balance) {
-        super(accountType, accountNumber, balance);
+    public BusinessAccount(AccountType accountType, String accountNumber, BigDecimal amount, CurrencyType currencyType)  {
+        super(accountType, accountNumber,currencyType ,amount);
     }
 }

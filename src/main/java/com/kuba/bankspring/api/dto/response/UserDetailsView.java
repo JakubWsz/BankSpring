@@ -1,9 +1,11 @@
 package com.kuba.bankspring.api.dto.response;
 
 import com.kuba.bankspring.entity.AccountType;
-import com.kuba.bankspring.entity.Balance;
 import com.kuba.bankspring.entity.Client;
+import com.kuba.bankspring.entity.CurrencyType;
 import com.kuba.bankspring.entity.User;
+
+import java.math.BigDecimal;
 
 public class UserDetailsView {
     private final Long id;
@@ -13,10 +15,12 @@ public class UserDetailsView {
     private final String accountNumber;
     private final Client client;
     private final User user;
-    private final Balance balance;
+//    private final Balance balance;
+    private final CurrencyType currencyType;
+    private final BigDecimal amount;
 
     public UserDetailsView(Long id, String login, String email, AccountType accountType,
-                           String accountNumber, Client client, User user, Balance balance) {
+                           String accountNumber, Client client, User user, CurrencyType currencyType, BigDecimal amount) {
         this.id = id;
         this.login = login;
         this.email = email;
@@ -24,7 +28,8 @@ public class UserDetailsView {
         this.accountNumber = accountNumber;
         this.client = client;
         this.user = user;
-        this.balance = balance;
+        this.currencyType = currencyType;
+        this.amount = amount;
     }
 
     @Override
@@ -37,7 +42,6 @@ public class UserDetailsView {
                 ", accountNumber='" + accountNumber + '\'' +
                 ", client=" + client +
                 ", user=" + user +
-                ", balance=" + balance +
                 '}';
     }
 }

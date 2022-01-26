@@ -1,12 +1,14 @@
 package com.kuba.bankspring.infrastructure.currency.exchange;
 
 import com.kuba.bankspring.domain.currency.exchange.CurrencyExchangeValueEUR;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Component
 public class CurrencyExchangeEURFixer implements CurrencyExchangeValueEUR {
     private final BigDecimal AUD;
     private final BigDecimal USD;

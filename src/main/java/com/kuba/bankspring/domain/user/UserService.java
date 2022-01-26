@@ -20,22 +20,23 @@ public class UserService {
     }
 
     public User createUser(String login, String password, String email, int pin) {
-        if (userRepository.isUserExists(login)) {
+        if (userRepository.findByLogin(login).isPresent()) {
             throw new RuntimeException("user already exists");
         }
 
         validateLoginPasswordEmailAndPin(login, password, email, pin);
 
-        return userRepository.saveUser(new User(login, password, email, pin));
+        return userRepository.save(new User(login, password, email, pin));
+        //TODO dodać factory dla usera
     }
 
     public User getUserById(long id) {
-        return userRepository.getById(id)
+        return userRepository.getUserById(id)
                 .orElseThrow(() -> new RuntimeException("user not found"));
     }
 
     public List<UserView> getAllUsers() {
-        return userRepository.getAll().stream()
+        return userRepository.findAll().stream()
                 .map(user -> new UserView(user.getId(), user.getLogin(), user.getEmail()))
                 .collect(Collectors.toList());
     }

@@ -6,27 +6,65 @@ import java.time.LocalDateTime;
 
 @Entity
 public class TransferSelf extends BaseEntity{
-    private Account account;
-    private TransferAmount transferAmount;
+    private String accountNumber;
+    private TransferType transferType;
+    private CurrencyType currencyType;
+    private BigDecimal amount;
     private BigDecimal balanceBefore;
     private LocalDateTime createdAt;
 
-    public TransferSelf(Account account, TransferAmount transferAmount, BigDecimal balanceBefore,
-                        LocalDateTime createdAt) {
-        this.account = account;
-        this.transferAmount = transferAmount;
+    public TransferSelf(String accountNumber, TransferType transferType, CurrencyType currencyType,
+                        BigDecimal amount, BigDecimal balanceBefore, LocalDateTime createdAt) {
+        this.accountNumber = accountNumber;
+        this.transferType = transferType;
+        this.currencyType = currencyType;
+        this.amount = amount;
         this.balanceBefore = balanceBefore;
         this.createdAt = createdAt;
     }
 
-    public TransferSelf() {}
+    public TransferSelf() {
 
-    public Account getAccount() {
-        return account;
     }
 
-    public TransferAmount getTransferAmount() {
-        return transferAmount;
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public TransferType getTransferSelfType() {
+        return transferType;
+    }
+
+    public void setTransferSelfType(TransferType transferType) {
+        this.transferType = transferType;
+    }
+
+    public CurrencyType getCurrencyType() {
+        return currencyType;
+    }
+
+    public void setCurrencyType(CurrencyType currencyType) {
+        this.currencyType = currencyType;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setBalanceBefore(BigDecimal balanceBefore) {
+        this.balanceBefore = balanceBefore;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public BigDecimal getBalanceBefore() {

@@ -28,7 +28,7 @@ public class ClientService {
     }
 
     private User getUser(String login, String password) {
-        return userRepository.getByLoginAndPassword(login, password)
+        return userRepository.getUserByLoginAndPassword(login, password)
                 .orElseThrow(() -> new RuntimeException("There is no client with passed login or password"));
     }
 
@@ -40,7 +40,7 @@ public class ClientService {
     }
 
     private Client saveClient(Client client) {
-        return clientRepository.saveClient(client);
+        return clientRepository.save(client);
     }
 
     private String IdCardNumberCreator(){

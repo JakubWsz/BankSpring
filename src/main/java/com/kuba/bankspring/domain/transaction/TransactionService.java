@@ -33,99 +33,100 @@ public class TransactionService {
     }
 
     // TODO: 09.01.2022 delete login and password and just check that user is logged or not
-    public Account deposit(TransferAmount transferAmount, String accountNumber, Integer pin,
-                           String login, String password) {
+    public Account deposit(BigDecimal transferAmount, String accountNumber, Integer pin,
+                           String login, String password, TransferType transferType,
+                           CurrencyType currencyType) {
         validateDepositAndWithdrawInput(transferAmount, accountNumber);
         Account account = accountService.getAccountByAccountNumber(accountNumber);
-        Optional<User> user = userRepository.getByLoginAndPassword(login,password);
+        Optional<User> user = userRepository.getUserByLoginAndPassword(login, password);
 
-       if (!pin.equals(user.get().getPin())){
-           throw new RuntimeException("Wrong PIN passed");
-       }
+        if (!pin.equals(user.get().getPin())) {
+            throw new RuntimeException("Wrong PIN passed");
+        }
 
-        if (transferAmount.getCurrencyType() != account.getBalance().getCurrencyType()) {
+        if (currencyType != account.getCurrencyType()) {
             throw new UnsupportedOperationException("different currency than account is unsupported yet");
         }
-        BigDecimal sum = account.getBalance().getAmount().add(transferAmount.getAmount());
-        account.getBalance().setAmount(sum);
+        BigDecimal sum = account.getAmount().add(transferAmount);
+        account.setAmount(sum);
         accountService.updateBalance(accountNumber, sum);
-        transferSelfRepository.saveTransferSelf(new TransferSelf(account, transferAmount,
-                sum.subtract(transferAmount.getAmount()), LocalDateTime.now()));
+        transferSelfRepository.save(new TransferSelf(accountNumber, transferType, currencyType,
+                transferAmount, sum.subtract(transferAmount), LocalDateTime.now()));
         return account;
     }
 
     // TODO: 09.01.2022 delete login and password and just check that user is logged or not
-    public Account withdraw(TransferAmount transferAmount, String accountNumber, Integer pin,
-                            String login, String password) {
+    public Account withdraw(BigDecimal transferAmount, TransferType transferType, CurrencyType currencyType
+            , String accountNumber, Integer pin, String login, String password) {
         validateDepositAndWithdrawInput(transferAmount, accountNumber);
         Account account = accountService.getAccountByAccountNumber(accountNumber);
-        Optional<User> user = userRepository.getByLoginAndPassword(login,password);
+        Optional<User> user = userRepository.getUserByLoginAndPassword(login, password);
 
-        if (!pin.equals(user.get().getPin())){
+        if (!pin.equals(user.get().getPin())) {
             throw new RuntimeException("Wrong PIN passed");
         }
 
-        if (transferAmount.getCurrencyType() != account.getBalance().getCurrencyType()) {
+        if (currencyType != account.getCurrencyType()) {
             throw new UnsupportedOperationException("different currency than account is unsupported yet");
         }
-        BigDecimal sum = account.getBalance().getAmount().subtract(transferAmount.getAmount());
-        account.getBalance().setAmount(sum);
+        BigDecimal sum = account.getAmount().subtract(transferAmount);
+        account.setAmount(sum);
         accountService.updateBalance(accountNumber, sum);
-        transferSelfRepository.saveTransferSelf(new TransferSelf(account, transferAmount,
-                sum.add(transferAmount.getAmount()), LocalDateTime.now()));
+        transferSelfRepository.save(new TransferSelf(accountNumber, transferType,
+                currencyType, transferAmount, sum.add(transferAmount), LocalDateTime.now()));
         return account;
     }
 
     public List<OperationView> getHistory(String accountNumber, Integer pin) {
         List<TransferSelf> historyTransferSelf = transferSelfRepository.getOperationsByAccountNumber(accountNumber);
         List<TransferBetweenAccounts> historyTransferBetween =
-                transferBetweenAccountsRepository.getOperationsByAccountNumberAndPin(accountNumber,pin);
+                transferBetweenAccountsRepository.findTransferBetweenAccountsByAccountNumber(accountNumber);
         List<OperationView> operations = new ArrayList<>();
 
         operations.addAll(mapToOperationsSelf(historyTransferSelf).stream()
-                .map(operation -> new OperationView(operation.getCreatedAt(),operation.getBalanceBefore(),
-                        operation.getTransferAmount(),operation.getCurrencyType(),operation.getMessage()))
+                .map(operation -> new OperationView(operation.getCreatedAt(), operation.getBalanceBefore(),
+                        operation.getTransferAmount(), operation.getCurrencyType(), operation.getMessage()))
                 .collect(Collectors.toList()));
 
         operations.addAll(mapToOperationsBetweenAccounts(historyTransferBetween).stream()
-                .map(operation -> new OperationView(operation.getCreatedAt(),operation.getBalanceBefore(),
-                        operation.getTransferAmount(),operation.getCurrencyType(),operation.getMessage()))
+                .map(operation -> new OperationView(operation.getCreatedAt(), operation.getBalanceBefore(),
+                        operation.getTransferAmount(), operation.getCurrencyType(), operation.getMessage()))
                 .collect(Collectors.toList()));
         operations.sort(Comparator.comparing(OperationView::getCreatedAt));
         return operations;
     }
 
     // TODO: 09.01.2022 delete login and password and just check that user is logged or not
-    public Account transfer(TransferAmount transferAmount, String myAccountNumber, String targetAccountNumber
+    public Account transfer(BigDecimal transferAmount, CurrencyType currencyType, TransferType transferType,
+                            String myAccountNumber, String targetAccountNumber
             , Integer pin, String login, String password) {
         validateTransferInput(transferAmount, myAccountNumber, targetAccountNumber);
         Account myAccount = accountService.getAccountByAccountNumber(myAccountNumber);
         Account targetAccount = accountService.getAccountByAccountNumber(targetAccountNumber);
-        Optional<User> user = userRepository.getByLoginAndPassword(login,password);
+        Optional<User> user = userRepository.getUserByLoginAndPassword(login, password);
 
 
-        if (!pin.equals(user.get().getPin())){
+        if (!pin.equals(user.get().getPin())) {
             throw new RuntimeException("Wrong PIN passed");
         }
-        if (transferAmount.getCurrencyType() != myAccount.getBalance().getCurrencyType()) {
+        if (currencyType != myAccount.getCurrencyType()) {
             throw new UnsupportedOperationException("different currency than account is unsupported yet");
         }
-        if (transferAmount.getCurrencyType() != targetAccount.getBalance().getCurrencyType()) {
+        if (currencyType != targetAccount.getCurrencyType()) {
             throw new UnsupportedOperationException("different currency than account is unsupported yet");
         }
-        BigDecimal mySum = myAccount.getBalance().getAmount().subtract(transferAmount.getAmount());
-        myAccount.getBalance().setAmount(mySum);
-        BigDecimal targetSum = targetAccount.getBalance().getAmount().add(transferAmount.getAmount());
-        targetAccount.getBalance().setAmount(targetSum);
+        BigDecimal mySum = myAccount.getAmount().subtract(transferAmount);
+        myAccount.setAmount(mySum);
+        BigDecimal targetSum = targetAccount.getAmount().add(transferAmount);
+        targetAccount.setAmount(targetSum);
         accountService.updateBalance(myAccountNumber, mySum);
         accountService.updateBalance(targetAccountNumber, targetSum);
-        transferBetweenAccountsRepository.saveTransferBetweenAccountsRepository(
-                new TransferBetweenAccounts(myAccount,transferAmount,
-                        mySum.add(transferAmount.getAmount()), LocalDateTime.now()));
-        transferBetweenAccountsRepository.saveTransferBetweenAccountsRepository(
-                new TransferBetweenAccounts(targetAccount
-                        , transferAmount, targetSum.add(transferAmount.getAmount()),
-                        LocalDateTime.now()));
+        transferBetweenAccountsRepository.save(
+                new TransferBetweenAccounts(myAccountNumber, transferAmount, currencyType, transferType,
+                        mySum.add(transferAmount), LocalDateTime.now()));
+        transferBetweenAccountsRepository.save(
+                new TransferBetweenAccounts(targetAccountNumber, transferAmount, currencyType, transferType,
+                        targetSum.add(transferAmount), LocalDateTime.now()));
         return myAccount;
     }
 
@@ -135,9 +136,9 @@ public class TransactionService {
             Operation operation = new Operation(
                     transferSelf.getCreatedAt(),
                     transferSelf.getBalanceBefore().toPlainString(),
-                    transferSelf.getTransferAmount().getAmount().toPlainString(),
-                    transferSelf.getTransferAmount().getCurrencyType().toString(),
-                    "deposit or withdraw " + transferSelf.getTransferAmount().getAmount().toPlainString()
+                    transferSelf.getAmount().toPlainString(),
+                    transferSelf.getCurrencyType().toString(),
+                    "deposit or withdraw " + transferSelf.getAmount().toPlainString()
                             + " at " + transferSelf.getCreatedAt());
             operations.add(operation);
         }
@@ -150,19 +151,19 @@ public class TransactionService {
             Operation operation = new Operation(
                     transferBetweenAccounts.getCreatedAt(),
                     transferBetweenAccounts.getBalanceBefore().toPlainString(),
-                    transferBetweenAccounts.getTransferAmount().getAmount().toPlainString(),
-                    transferBetweenAccounts.getTransferAmount().getCurrencyType().toString(),
+                    transferBetweenAccounts.getTransferAmount().toPlainString(),
+                    transferBetweenAccounts.getTransferAmount().toString(),
                     "deposit or withdraw " + transferBetweenAccounts
-                            .getTransferAmount().getAmount().toPlainString()
+                            .getTransferAmount().toPlainString()
                             + " at " + transferBetweenAccounts.getCreatedAt());
             operations.add(operation);
         }
         return operations;
     }
 
-    private void validateDepositAndWithdrawInput(TransferAmount transferAmount, String accountNumber) {
+    private void validateDepositAndWithdrawInput(BigDecimal transferAmount, String accountNumber) {
 
-        if (transferAmount.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+        if (transferAmount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("operation disallowed");
         }
         if (accountNumber == null) {
@@ -170,9 +171,9 @@ public class TransactionService {
         }
     }
 
-    private void validateTransferInput(TransferAmount transferAmount, String myAccountNumber,
+    private void validateTransferInput(BigDecimal transferAmount, String myAccountNumber,
                                        String targetAccountNumber) {
-        if (transferAmount.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+        if (transferAmount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("operation disallowed");
         }
         if (myAccountNumber == null) {

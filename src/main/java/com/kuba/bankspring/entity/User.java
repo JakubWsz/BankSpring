@@ -3,16 +3,16 @@ package com.kuba.bankspring.entity;
 import javax.persistence.Entity;
 
 @Entity
-public class User extends BaseEntity{
+public class User extends BaseEntity {
     private String login;
     private String password;
     private String email;
-    private Integer pin;
+    private int pin;
 
     public User() {
     }
 
-    public User(String login, String password, String email, Integer pin) {
+    public User(String login, String password, String email, int pin) {
         this.login = login;
         this.password = password;
         this.email = email;
