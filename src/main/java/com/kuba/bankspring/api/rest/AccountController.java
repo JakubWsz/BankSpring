@@ -24,8 +24,7 @@ public class AccountController {
                 createAccountRequest.getLastName(),
                 createAccountRequest.getEmail(),
                 createAccountRequest.getAccountType(),
-                createAccountRequest.getCurrencyType(),
-                createAccountRequest.getPin()
+                createAccountRequest.getCurrencyType()
         );
     }
 }

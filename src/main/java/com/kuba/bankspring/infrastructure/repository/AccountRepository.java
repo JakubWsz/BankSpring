@@ -10,9 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    boolean isAccountExists(Long id);
-    Account saveAccount(Account account);
-    List<Account> getAccountsByUserId(long userId);
     Optional<Account> getByAccountNumber(String accountNumber);
-    void updateBalance(String accountNumber, BigDecimal amount);
+    Optional<Account> findAccountByAccountNumber(String accountNumber);
 }

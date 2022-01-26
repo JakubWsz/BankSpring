@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TransferSelfRepository extends JpaRepository<TransferSelf, Long> {
-    TransferSelf saveTransferSelf(TransferSelf transferSelf);
     List<TransferSelf> getOperationsByAccountNumber(String accountNumber);
 }

@@ -10,17 +10,15 @@ public class CreateAccountRequest {
     private final User user;
     private final AccountType accountType;
     private final CurrencyType currencyType;
-    private final Integer pin;
 
     public CreateAccountRequest(String firstName, String lastName, String email, User user,
-                                AccountType accountType, CurrencyType currencyType, Integer pin) {
+                                AccountType accountType, CurrencyType currencyType) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.user = user;
         this.accountType = accountType;
         this.currencyType = currencyType;
-        this.pin = pin;
     }
 
     public String getFirstName() {
@@ -43,9 +41,5 @@ public class CreateAccountRequest {
 
     public CurrencyType getCurrencyType() {
         return currencyType;
-    }
-
-    public Integer getPin() {
-        return pin;
     }
 }

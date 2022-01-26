@@ -9,10 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    boolean isUserExists(String login);
-    User saveUser(User user);
-    Optional<User> getById(long id);
-    Optional<User> getByLoginAndPassword(String login, String password);
+    Optional<User> findByLogin(String login);
+    Optional<User> getUserById(long id);
+    Optional<User> getUserByLoginAndPassword(String login, String password);
     Optional<User> getUserByEmail(String email);
-    List<User> getAll();
 }

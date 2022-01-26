@@ -3,7 +3,6 @@ package com.kuba.bankspring.domain.currency;
 import com.kuba.bankspring.domain.account.AccountService;
 import com.kuba.bankspring.domain.currency.exchange.CurrencyExchangeService;
 import com.kuba.bankspring.entity.Account;
-import com.kuba.bankspring.entity.Balance;
 import com.kuba.bankspring.entity.CurrencyType;
 import com.kuba.bankspring.entity.TransferAmount;
 import org.springframework.stereotype.Component;
@@ -22,8 +21,8 @@ public class CurrencyExchangeUserManager {
 
     public BigDecimal balanceCurrencyView(String accountNumber, CurrencyType currencyType) {
         Account account = accountService.getAccountByAccountNumber(accountNumber);
-        Balance balance = account.getBalance();
-        TransferAmount transferAmount = new TransferAmount(balance.getAmount(), balance.getCurrencyType());
+       // Balance balance = account.getBalance();
+        TransferAmount transferAmount = new TransferAmount(account.getAmount(), account.getCurrencyType());
         return currencyExchangeService.currencyExchangeWithProvision(transferAmount, currencyType);
     }
 }
