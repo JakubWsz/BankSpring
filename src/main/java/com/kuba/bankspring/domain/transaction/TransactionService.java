@@ -122,10 +122,10 @@ public class TransactionService {
         accountService.updateBalance(myAccountNumber, mySum);
         accountService.updateBalance(targetAccountNumber, targetSum);
         transferBetweenAccountsRepository.save(
-                new TransferBetweenAccounts(myAccountNumber, transferAmount, currencyType, transferType,
+                new TransferBetweenAccounts(myAccountNumber, transferAmount, currencyType,
                         mySum.add(transferAmount), LocalDateTime.now()));
         transferBetweenAccountsRepository.save(
-                new TransferBetweenAccounts(targetAccountNumber, transferAmount, currencyType, transferType,
+                new TransferBetweenAccounts(targetAccountNumber, transferAmount, currencyType,
                         targetSum.add(transferAmount), LocalDateTime.now()));
         return myAccount;
     }

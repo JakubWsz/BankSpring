@@ -13,7 +13,7 @@ public class TransferBetweenAccounts extends BaseEntity{
     private LocalDateTime createdAt;
 
     public TransferBetweenAccounts(String accountNumber, BigDecimal transferAmount, CurrencyType currencyType,
-                                   TransferType transferType, BigDecimal balanceBefore, LocalDateTime createdAt) {
+                                   BigDecimal balanceBefore, LocalDateTime createdAt) {
         this.accountNumber = accountNumber;
         this.transferAmount = transferAmount;
         this.currencyType = currencyType;
